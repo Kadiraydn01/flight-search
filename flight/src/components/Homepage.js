@@ -26,6 +26,7 @@ const Homepage = () => {
   });
 
   const [loading, setLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState("Bilet Ara");
 
   const navigate = useNavigate();
 
@@ -129,17 +130,21 @@ const Homepage = () => {
       !biletVerisi.gidisTarihi
     ) {
       alert("Lütfen nereden, nereye ve gidiş tarihini seçin.");
+      setLoading(false);
+      setLoadingText("Bilet Ara");
       return;
     }
 
     if (biletVerisi.giseSecimi === "gidisDonus" && !biletVerisi.donusTarihi) {
       alert("Lütfen dönüş tarihini seçin.");
+      setLoading(false);
+      setLoadingText("Bilet Ara");
       return;
     }
 
     setLoading(true);
+    setLoadingText("Yükleniyor...");
 
-    // 2 saniye sonra /booking sayfasına yönlendirme
     setTimeout(async () => {
       const cityData = {
         nereden: biletVerisi.nereden,
@@ -151,8 +156,9 @@ const Homepage = () => {
 
       await setContextData({ selectedCity: cityData });
       setLoading(false);
+      setLoadingText("Bilet Ara");
       navigate("/booking");
-    }, 2000);
+    }, 3000);
   };
 
   const filteredCities = data.filter((city) =>
@@ -292,9 +298,12 @@ const Homepage = () => {
             onClick={handleBooking}
           >
             {loading ? (
-              <RiLoader3Line className="animate-spin text-white" />
+              <div className="flex items-center justify-center">
+                <RiLoader3Line className="animate-spin text-white mr-2" />
+                {loadingText}
+              </div>
             ) : (
-              "Bilet Ara"
+              loadingText
             )}
           </button>
         </div>

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AppContext = createContext();
 
@@ -6,6 +6,17 @@ export const AppProvider = ({ children }) => {
   const [appData, setAppData] = useState({
     selectedCity: null,
   });
+
+  useEffect(() => {
+    const storedData = localStorage.getItem("appData");
+    if (storedData) {
+      setAppData(JSON.parse(storedData));
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("appData", JSON.stringify(appData));
+  }, [appData]);
 
   const setContextData = (data) => {
     setAppData((prevData) => ({ ...prevData, ...data }));
