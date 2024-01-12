@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FaExchangeAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { RiLoader3Line } from "react-icons/ri";
 import data from "../mock/data";
 import { useAppContext } from "../context/AppContext";
 
 const Homepage = () => {
-  const { appData, setContextData } = useAppContext();
+  const { setContextData } = useAppContext();
   const [giseSecimi, setGiseSecimi] = useState("tekGidis");
   const [biletVerisi, setBiletVerisi] = useState({
     giseSecimi: "tekGidis",
@@ -18,6 +19,14 @@ const Homepage = () => {
   const [neredenMenu, setNeredenMenu] = useState(false);
   const [nereyeMenu, setNereyeMenu] = useState(false);
   const [citySearch, setCitySearch] = useState("");
+
+  const [dateError, setDateError] = useState({
+    gidisTarihi: "",
+    donusTarihi: "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
 
   const handleGiseSecimiChange = (value) => {
@@ -34,6 +43,42 @@ const Homepage = () => {
       ...biletVerisi,
       [field]: date,
     });
+
+    if (field === "gidisTarihi") {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+
+      const selectedDate = new Date(date);
+
+      if (selectedDate < yesterday) {
+        setDateError({
+          ...dateError,
+          gidisTarihi: "Geçersiz tarih!",
+        });
+      } else {
+        setDateError({
+          ...dateError,
+          gidisTarihi: "",
+        });
+      }
+    }
+
+    if (field === "donusTarihi") {
+      const departureDate = new Date(biletVerisi.gidisTarihi);
+      const selectedReturnDate = new Date(date);
+
+      if (selectedReturnDate < departureDate) {
+        setDateError({
+          ...dateError,
+          donusTarihi: "Dönüş tarihi, gidiş tarihinden önce olamaz.",
+        });
+      } else {
+        setDateError({
+          ...dateError,
+          donusTarihi: "",
+        });
+      }
+    }
   };
 
   const handleExchangeClick = () => {
@@ -57,10 +102,19 @@ const Homepage = () => {
   };
 
   const handleCitySelect = (city, field) => {
+    if (field === "nereden" && city === biletVerisi.nereye) {
+      return;
+    }
+
+    if (field === "nereye" && city === biletVerisi.nereden) {
+      return;
+    }
+
     setBiletVerisi({
       ...biletVerisi,
       [field]: city,
     });
+
     if (field === "nereden") {
       setNeredenMenu(false);
     } else if (field === "nereye") {
@@ -69,20 +123,37 @@ const Homepage = () => {
   };
 
   const handleBooking = async () => {
-    const cityData = {
-      nereden: biletVerisi.nereden,
-      nereye: biletVerisi.nereye,
-    };
-
-    await setContextData({ selectedCity: cityData });
-    navigate("/booking");
-  };
-
-  useEffect(() => {
-    if (appData.selectedCity) {
-      navigate("/booking");
+    if (
+      !biletVerisi.nereden ||
+      !biletVerisi.nereye ||
+      !biletVerisi.gidisTarihi
+    ) {
+      alert("Lütfen nereden, nereye ve gidiş tarihini seçin.");
+      return;
     }
-  }, [appData.selectedCity, navigate]);
+
+    if (biletVerisi.giseSecimi === "gidisDonus" && !biletVerisi.donusTarihi) {
+      alert("Lütfen dönüş tarihini seçin.");
+      return;
+    }
+
+    setLoading(true);
+
+    // 2 saniye sonra /booking sayfasına yönlendirme
+    setTimeout(async () => {
+      const cityData = {
+        nereden: biletVerisi.nereden,
+        nereye: biletVerisi.nereye,
+        gidisTarihi: biletVerisi.gidisTarihi,
+        donusTarihi: biletVerisi.donusTarihi,
+        giseSecimi: biletVerisi.giseSecimi,
+      };
+
+      await setContextData({ selectedCity: cityData });
+      setLoading(false);
+      navigate("/booking");
+    }, 2000);
+  };
 
   const filteredCities = data.filter((city) =>
     city.toLowerCase().includes(citySearch.toLowerCase())
@@ -90,7 +161,7 @@ const Homepage = () => {
 
   return (
     <div>
-      <div className="flex ml-10 mt-12 overflow-hidden">
+      <div className="flex ml-10 mt-12 ">
         <label
           className={`bg-blue-500 px-4 py-2 rounded-l cursor-pointer ${
             giseSecimi === "tekGidis"
@@ -112,22 +183,20 @@ const Homepage = () => {
           Gidiş-Dönüş
         </label>
       </div>
-      <div className="flex items-start h-[350px] justify-around gap-6 border mt-4">
-        <div className="flex mt-20 gap-4">
-          <div className="flex flex-col  px-16 text-center">
-            <label className="bg-slate-100">Nereden</label>
+      <div className="flex items-start h-[400px] justify-around gap-6 border mt-4">
+        <div className="flex mt-20 gap-4 overflow-x-hidden max-w-[800px]">
+          <div className="flex flex-col gap-4  px-16 text-center">
+            <label className="font-light">Nereden</label>
             <label
-              className={`cursor-pointer border ${
-                neredenMenu && "bg-blue-200"
-              }`}
+              className={`cursor-pointer ${neredenMenu && "bg-blue-200"}`}
               onClick={() => handleMenuClick("nereden")}
             >
               {biletVerisi.nereden
                 ? biletVerisi.nereden.split("-")[0].trim()
-                : "Şehir Seçin"}
+                : "_______________"}
             </label>
             {neredenMenu && (
-              <div>
+              <div className="city-list-container">
                 <input
                   type="text"
                   placeholder="Şehir Ara"
@@ -135,8 +204,8 @@ const Homepage = () => {
                   onChange={(e) => setCitySearch(e.target.value)}
                   className="border border-gray-300 rounded mt-1 px-2 py-1"
                 />
-                <ul className="border border-gray-300 rounded mt-1">
-                  {filteredCities.slice(0, 5).map((city) => (
+                <ul className="border border-gray-300 bg-slate-400 max-w-[200px] rounded mt-1 max-h-40 overflow-y-auto city-list">
+                  {filteredCities.map((city) => (
                     <li
                       key={city}
                       className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${
@@ -151,24 +220,24 @@ const Homepage = () => {
               </div>
             )}
           </div>
-          <div className="flex border rounded-full flex-row justify-center items-center">
+          <div className="flex border max-h-12 bg-gray-300 max-w-12 rounded-full flex-row justify-center items-center">
             <FaExchangeAlt
               className="cursor-pointer text-xl mx-4"
               onClick={() => handleExchangeClick()}
             />
           </div>
-          <div className="flex flex-col  px-16 text-center">
-            <label className="bg-slate-100">Nereye</label>
+          <div className="flex flex-col gap-4  px-16 text-center">
+            <label className="font-light">Nereye</label>
             <label
               className={`cursor-pointer ${nereyeMenu && "bg-blue-200"}`}
               onClick={() => handleMenuClick("nereye")}
             >
               {biletVerisi.nereye
                 ? biletVerisi.nereye.split("-")[0].trim()
-                : "Şehir Seçiniz"}
+                : "_______________"}
             </label>
             {nereyeMenu && (
-              <div>
+              <div className="city-list-container">
                 <input
                   type="text"
                   placeholder="Şehir Ara"
@@ -176,8 +245,8 @@ const Homepage = () => {
                   onChange={(e) => setCitySearch(e.target.value)}
                   className="border border-gray-300 rounded mt-1 px-2 py-1"
                 />
-                <ul className="border border-gray-300 rounded mt-1">
-                  {filteredCities.slice(0, 5).map((city) => (
+                <ul className="border border-gray-300 bg-slate-500 rounded mt-1 max-h-40 overflow-y-auto city-list">
+                  {filteredCities.map((city) => (
                     <li
                       key={city}
                       className={`px-4 py-2 cursor-pointer hover:bg-gray-100 ${
@@ -194,15 +263,18 @@ const Homepage = () => {
           </div>
         </div>
 
-        <div className="flex flex-col mt-20 border px-5">
+        <div className="flex flex-col mt-20 px-5">
           <label className="text-center items-center">Gidiş Tarihi:</label>
           <input
             type="date"
             value={biletVerisi.gidisTarihi}
             onChange={(e) => handleDateChange(e.target.value, "gidisTarihi")}
           />
+          {dateError.gidisTarihi && (
+            <p className="text-red-500">{dateError.gidisTarihi}</p>
+          )}
         </div>
-        <div className="flex flex-col mt-20 border px-5 ">
+        <div className="flex flex-col mt-20 px-5 ">
           <label className="text-center items-center">Dönüş Tarihi:</label>
           <input
             type="date"
@@ -210,13 +282,20 @@ const Homepage = () => {
             onChange={(e) => handleDateChange(e.target.value, "donusTarihi")}
             disabled={giseSecimi === "tekGidis"}
           />
+          {dateError.donusTarihi && (
+            <p className="text-red-500">{dateError.donusTarihi}</p>
+          )}
         </div>
         <div className="mt-20">
           <button
             className="bg-orange-500 text-white px-4 py-2 rounded mt-2 cursor-pointer"
             onClick={handleBooking}
           >
-            Bilet Ara
+            {loading ? (
+              <RiLoader3Line className="animate-spin text-white" />
+            ) : (
+              "Bilet Ara"
+            )}
           </button>
         </div>
       </div>
