@@ -303,7 +303,7 @@ const Homepage = () => {
               )}
             </div>
           </div>
-          {/* <div>neresi</div> */}
+
           <div className="flex flex-col mt-20 px-5">
             <label className="text-center items-center">Gidiş Tarihi:</label>
             <DatePicker
