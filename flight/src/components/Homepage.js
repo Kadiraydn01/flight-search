@@ -191,7 +191,7 @@ const Homepage = () => {
           {sliderImages.map((image, index) => (
             <div key={index}>
               <img
-                className="max-h-[450px] w-full"
+                className="min-h-[300px] sm:max-h-[500px] max-w-full"
                 src={image}
                 alt={`Slider ${index + 1}`}
               />
@@ -222,9 +222,9 @@ const Homepage = () => {
             Gidiş-Dönüş
           </label>
         </div>
-        <div className="flex items-start h-[400px] justify-around gap-6 border mt-4 mx-auto ">
-          <div className="flex mt-20 gap-4 overflow-x-hidden max-w-[800px]">
-            <div className="flex flex-col gap-4  px-16 text-center">
+        <div className="flex flex-col sm:flex-row items-start sm:h-[400px] justify-around gap-6 border mt-4 mx-auto">
+          <div className="flex mx-auto mt-20 gap-4 overflow-x-hidden max-w-[800px]">
+            <div className="flex flex-col gap-4 sm:mt-20 px-2 sm:px-16 text-center">
               <label className="font-light">Nereden</label>
               <label
                 className={`cursor-pointer ${neredenMenu && "bg-blue-200 "}`}
@@ -260,13 +260,13 @@ const Homepage = () => {
                 </div>
               )}
             </div>
-            <div className="flex border max-h-12 bg-gray-300 max-w-12 rounded-full flex-row justify-center items-center">
+            <div className="flex border max-h-12 bg-gray-300 max-w-12 rounded-full sm:hidden sm:flex-row justify-center items-center">
               <FaExchangeAlt
                 className="cursor-pointer text-xl mx-4"
                 onClick={() => handleExchangeClick()}
               />
             </div>
-            <div className="flex flex-col gap-4  px-16 text-center">
+            <div className="flex flex-col gap-4 sm:mt-20 px-2 sm:px-16 text-center">
               <label className="font-light">Nereye</label>
               <label
                 className={`cursor-pointer ${nereyeMenu && "bg-blue-200"}`}
@@ -304,7 +304,7 @@ const Homepage = () => {
             </div>
           </div>
 
-          <div className="flex flex-col mt-20 px-5">
+          <div className="flex flex-col mx-auto gap-4 sm:gap-6 mt-2 sm:my-auto px-2 sm:px-16">
             <label className="text-center items-center">Gidiş Tarihi:</label>
             <DatePicker
               className="items-center border text-center"
@@ -319,7 +319,7 @@ const Homepage = () => {
             )}
           </div>
 
-          <div className="flex flex-col mt-20 px-5 ">
+          <div className="flex flex-col mx-auto gap-4 sm:gap-6 mt-2 sm:my-auto px-2 sm:px-16">
             <label className="text-center items-center">Dönüş Tarihi:</label>
             <DatePicker
               className="items-center text-center"
@@ -333,9 +333,9 @@ const Homepage = () => {
               <p className="text-red-500">{dateError.donusTarihi}</p>
             )}
           </div>
-          <div className="mt-20">
+          <div className="mt-4 mx-auto sm:my-auto">
             <button
-              className={`bg-orange-500 text-white px-20 py-2 rounded mt-2 cursor-pointer ${
+              className={`bg-orange-500 text-white px-10 sm:px-20 py-2 rounded mt-2 cursor-pointer ${
                 isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""
               }`}
               onClick={handleBooking}
