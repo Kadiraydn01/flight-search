@@ -194,7 +194,7 @@ const Homepage = () => {
           <div className="flex flex-col gap-4  px-16 text-center">
             <label className="font-light">Nereden</label>
             <label
-              className={`cursor-pointer ${neredenMenu && "bg-blue-200"}`}
+              className={`cursor-pointer  ${neredenMenu && "bg-blue-200 "}`}
               onClick={() => handleMenuClick("nereden")}
             >
               {biletVerisi.nereden
@@ -235,7 +235,9 @@ const Homepage = () => {
           <div className="flex flex-col gap-4  px-16 text-center">
             <label className="font-light">Nereye</label>
             <label
-              className={`cursor-pointer ${nereyeMenu && "bg-blue-200"}`}
+              className={`cursor-pointer w-[300px] ${
+                nereyeMenu && "bg-blue-200"
+              }`}
               onClick={() => handleMenuClick("nereye")}
             >
               {biletVerisi.nereye
