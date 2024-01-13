@@ -32,6 +32,20 @@ const Booking = () => {
     );
   };
 
+  const getDayOfWeek = (date) => {
+    const days = [
+      "Pazar",
+      "Pazartesi",
+      "Salı",
+      "Çarşamba",
+      "Perşembe",
+      "Cuma",
+      "Cumartesi",
+    ];
+    const dayIndex = date.getDay();
+    return days[dayIndex];
+  };
+
   const sortFlights = (flights) => {
     return flights.slice().sort((a, b) => {
       if (sortOrder === "cheapToExpensive") {
@@ -118,18 +132,22 @@ const Booking = () => {
         day: "numeric",
       });
 
+      const dayOfWeek = getDayOfWeek(date);
+
       return (
-        <button
-          key={formattedDate}
-          onClick={() => handleReturnDateChange(date)}
-          className={`px-32 py-5 rounded ${
-            date.toISOString() === selectedReturnDate?.toISOString()
-              ? "bg-orange-600 text-white"
-              : "bg-orange-300 text-white"
-          }`}
-        >
-          {formattedDate}
-        </button>
+        <div key={formattedDate} className="text-center">
+          <button
+            onClick={() => handleReturnDateChange(date)}
+            className={`px-32 py-5 rounded ${
+              date.toISOString() === selectedReturnDate?.toISOString()
+                ? "bg-orange-600 text-white"
+                : "bg-orange-300 text-white"
+            }`}
+          >
+            {formattedDate}
+            <p className="text-black">{dayOfWeek}</p>
+          </button>
+        </div>
       );
     });
   };

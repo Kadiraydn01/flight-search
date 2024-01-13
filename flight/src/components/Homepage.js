@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { RiLoader3Line } from "react-icons/ri";
 import data from "../mock/data";
 import { useAppContext } from "../context/AppContext";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const Homepage = () => {
   const { setContextData } = useAppContext();
@@ -273,21 +275,24 @@ const Homepage = () => {
 
         <div className="flex flex-col mt-20 px-5">
           <label className="text-center items-center">Gidiş Tarihi:</label>
-          <input
-            type="date"
-            value={biletVerisi.gidisTarihi}
-            onChange={(e) => handleDateChange(e.target.value, "gidisTarihi")}
+          <DatePicker
+            selected={biletVerisi.gidisTarihi}
+            onChange={(date) => handleDateChange(date, "gidisTarihi")}
+            dateFormat="dd/MM/yyyy"
+            minDate={new Date()} // Set minimum date to today
           />
           {dateError.gidisTarihi && (
             <p className="text-red-500">{dateError.gidisTarihi}</p>
           )}
         </div>
+
         <div className="flex flex-col mt-20 px-5 ">
           <label className="text-center items-center">Dönüş Tarihi:</label>
-          <input
-            type="date"
-            value={biletVerisi.donusTarihi || ""}
-            onChange={(e) => handleDateChange(e.target.value, "donusTarihi")}
+          <DatePicker
+            selected={biletVerisi.donusTarihi}
+            onChange={(date) => handleDateChange(date, "donusTarihi")}
+            dateFormat="dd/MM/yyyy"
+            minDate={biletVerisi.gidisTarihi || new Date()} // Set minimum date to gidisTarihi or today
             disabled={giseSecimi === "tekGidis"}
           />
           {dateError.donusTarihi && (
