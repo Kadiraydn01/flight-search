@@ -191,7 +191,7 @@ const Homepage = () => {
           {sliderImages.map((image, index) => (
             <div key={index}>
               <img
-                className="min-h-[300px] sm:max-h-[500px] max-w-full"
+                className="min-h-[300px] sm:max-h-[500px] min-w-full"
                 src={image}
                 alt={`Slider ${index + 1}`}
               />
