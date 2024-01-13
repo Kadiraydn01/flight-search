@@ -126,24 +126,6 @@ const Homepage = () => {
   };
 
   const handleBooking = async () => {
-    if (
-      !biletVerisi.nereden ||
-      !biletVerisi.nereye ||
-      !biletVerisi.gidisTarihi
-    ) {
-      alert("Lütfen nereden, nereye ve gidiş tarihini seçin.");
-      setLoading(false);
-      setLoadingText("Bilet Ara");
-      return;
-    }
-
-    if (biletVerisi.giseSecimi === "gidisDonus" && !biletVerisi.donusTarihi) {
-      alert("Lütfen dönüş tarihini seçin.");
-      setLoading(false);
-      setLoadingText("Bilet Ara");
-      return;
-    }
-
     setLoading(true);
     setLoadingText("Yükleniyor...");
 
@@ -166,6 +148,12 @@ const Homepage = () => {
   const filteredCities = data.filter((city) =>
     city.toLowerCase().includes(citySearch.toLowerCase())
   );
+
+  const isButtonDisabled =
+    !biletVerisi.nereden ||
+    !biletVerisi.nereye ||
+    !biletVerisi.gidisTarihi ||
+    (biletVerisi.giseSecimi === "gidisDonus" && !biletVerisi.donusTarihi);
 
   return (
     <div>
@@ -196,7 +184,7 @@ const Homepage = () => {
           <div className="flex flex-col gap-4  px-16 text-center">
             <label className="font-light">Nereden</label>
             <label
-              className={`cursor-pointer  ${neredenMenu && "bg-blue-200 "}`}
+              className={`cursor-pointer ${neredenMenu && "bg-blue-200 "}`}
               onClick={() => handleMenuClick("nereden")}
             >
               {biletVerisi.nereden
@@ -212,7 +200,7 @@ const Homepage = () => {
                   onChange={(e) => setCitySearch(e.target.value)}
                   className="border border-gray-300 rounded mt-1 px-2 py-1"
                 />
-                <ul className="border border-gray-300 bg-slate-400 max-w-[200px] rounded mt-1 max-h-40 overflow-y-auto city-list">
+                <ul className="border border-gray-300 bg-slate-400  rounded mt-1 max-h-40 overflow-y-auto city-list">
                   {filteredCities.map((city) => (
                     <li
                       key={city}
@@ -237,9 +225,7 @@ const Homepage = () => {
           <div className="flex flex-col gap-4  px-16 text-center">
             <label className="font-light">Nereye</label>
             <label
-              className={`cursor-pointer w-[300px] ${
-                nereyeMenu && "bg-blue-200"
-              }`}
+              className={`cursor-pointer ${nereyeMenu && "bg-blue-200"}`}
               onClick={() => handleMenuClick("nereye")}
             >
               {biletVerisi.nereye
@@ -276,10 +262,11 @@ const Homepage = () => {
         <div className="flex flex-col mt-20 px-5">
           <label className="text-center items-center">Gidiş Tarihi:</label>
           <DatePicker
+            className="items-center text-center"
             selected={biletVerisi.gidisTarihi}
             onChange={(date) => handleDateChange(date, "gidisTarihi")}
             dateFormat="dd/MM/yyyy"
-            minDate={new Date()} // Set minimum date to today
+            minDate={new Date()}
           />
           {dateError.gidisTarihi && (
             <p className="text-red-500">{dateError.gidisTarihi}</p>
@@ -289,10 +276,11 @@ const Homepage = () => {
         <div className="flex flex-col mt-20 px-5 ">
           <label className="text-center items-center">Dönüş Tarihi:</label>
           <DatePicker
+            className="items-center text-center"
             selected={biletVerisi.donusTarihi}
             onChange={(date) => handleDateChange(date, "donusTarihi")}
             dateFormat="dd/MM/yyyy"
-            minDate={biletVerisi.gidisTarihi || new Date()} // Set minimum date to gidisTarihi or today
+            minDate={biletVerisi.gidisTarihi || new Date()}
             disabled={giseSecimi === "tekGidis"}
           />
           {dateError.donusTarihi && (
@@ -301,8 +289,11 @@ const Homepage = () => {
         </div>
         <div className="mt-20">
           <button
-            className="bg-orange-500 text-white px-4 py-2 rounded mt-2 cursor-pointer"
+            className={`bg-orange-500 text-white px-20 py-2 rounded mt-2 cursor-pointer ${
+              isButtonDisabled ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             onClick={handleBooking}
+            disabled={isButtonDisabled}
           >
             {loading ? (
               <div className="flex items-center justify-center">
@@ -313,6 +304,11 @@ const Homepage = () => {
               loadingText
             )}
           </button>
+          {isButtonDisabled && (
+            <p className="text-red-500 mt-2">
+              Tüm bilgileri eksiksiz doldurunuz.
+            </p>
+          )}
         </div>
       </div>
     </div>

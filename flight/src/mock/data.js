@@ -1,5 +1,4 @@
 const data = [
-  "Select",
   "Abudhabi",
   "Adana",
   "Adiyaman",
