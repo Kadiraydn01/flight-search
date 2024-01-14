@@ -260,7 +260,7 @@ const Homepage = () => {
                 </div>
               )}
             </div>
-            <div className="flex border max-h-12 bg-gray-300 max-w-12 rounded-full sm:hidden sm:flex-row justify-center items-center">
+            <div className="flex border max-h-12 bg-gray-300 max-w-12 rounded-full sm:border sm:mt-24  sm:flex-row justify-center items-center">
               <FaExchangeAlt
                 className="cursor-pointer text-xl mx-4"
                 onClick={() => handleExchangeClick()}
@@ -322,7 +322,7 @@ const Homepage = () => {
           <div className="flex flex-col mx-auto gap-4 sm:gap-6 mt-2 sm:my-auto px-2 sm:px-16">
             <label className="text-center items-center">Dönüş Tarihi:</label>
             <DatePicker
-              className="items-center text-center"
+              className="items-center border text-center"
               selected={biletVerisi.donusTarihi}
               onChange={(date) => handleDateChange(date, "donusTarihi")}
               dateFormat="dd/MM/yyyy"
